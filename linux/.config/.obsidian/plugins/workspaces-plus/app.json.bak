@@ -1,0 +1,9 @@
+{
+  "alwaysUpdateLinks": true,
+  "showLineNumber": false,
+  "strictLineBreaks": false,
+  "readableLineLength": true,
+  "promptDelete": false,
+  "tabSize": 2,
+  "vimMode": false
+}
