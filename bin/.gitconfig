@@ -1,5 +1,6 @@
 [core]
     pager = delta
+    eol = lf
 
 [interactive]
     diffFilter = delta --color-only
