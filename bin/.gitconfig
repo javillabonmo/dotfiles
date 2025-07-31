@@ -1,4 +1,5 @@
 [core]
+    editor = nvim
     pager = delta
     eol = lf
 
@@ -11,3 +12,4 @@
 
 [merge]
     conflictstyle = zdiff3
+    side-by-side = true
