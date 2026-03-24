@@ -1,0 +1,8 @@
+{
+  "packages": [
+    { "packageIdentifier": "Git.Git" },
+    { "packageIdentifier": "Microsoft.VisualStudioCode" },
+    { "packageIdentifier": "Docker.DockerDesktop" },
+    { "packageIdentifier": "ActivityWatch.ActivityWatch" }
+  ]
+}

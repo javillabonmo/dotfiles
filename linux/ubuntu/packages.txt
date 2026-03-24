@@ -1,0 +1,6 @@
+git
+build-essential
+nodejs
+python3
+python3-pip
+docker.io
