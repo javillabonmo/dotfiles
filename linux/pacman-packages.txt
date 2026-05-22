@@ -1,44 +1,7 @@
--- Paquetes oficiales de pacman
 local pacman_packages = {
-  -- Sistema base
-  "base", "base-devel", "sudo", "polkit", "grub", "network-manager",
-  "iwd", "wpa_supplicant", "openssh", "smartmontools", "usbutils", "xdg-utils",
-  "xdg-desktop-portal",
-
-  -- Xorg y drivers
-  "xorg-server", "xorg-xinit", "mesa",
-  "xf86-video-amdgpu", "xf86-video-ati", "xf86-video-nouveau", "xf86-video-vmware",
-  "libva-mesa-driver", "libva-intel-driver", "intel-media-driver",
-  "vulkan-radeon", "vulkan-intel", "vulkan-nouveau",
-
   -- Herramientas de desarrollo
-  "git", "gcc", "binutils", "cmake", "fpc", "lua", "jdk17-openjdk",
+  "git",
 
   -- Herramientas de consola
-  "neovim", "tmux", "fzf", "neofetch", "htop", "wget",
-
-  -- Archivos y discos
-  "p7zip", "xarchiver", "gdisk", "gparted",
-
-  -- Multimedia
-  "pipewire", "pulseaudio", "vlc", "ffmpeg", "v4l-utils", "shotwell", "obs-studio",
-
-  -- Wayland / UI
-  "grim", "slurp", "swappy", "wl-clipboard", "qt5-wayland", "qt6-wayland", "copyq",
-
-  -- Otros
-  "keepassxc", "chezmoi", "silicon"
-}
--- Paquetes de AUR (instalar con yay)
-local aur_packages = {
-  "obsidian",
-  "spotify",
-  "pandoc-bin",
-  "yazi",
-  "helvum",
-  "git-delta"
-}
--- Paquetes de npm globales
-local npm_packages = {
-  "obsidian-export"
+  "neovim", "tmux", "fzf", "htop"
 }
