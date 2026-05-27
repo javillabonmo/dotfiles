@@ -4,3 +4,5 @@ nodejs
 python3
 python3-pip
 docker.io
+unzip
+bun

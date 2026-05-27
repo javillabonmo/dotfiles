@@ -1,0 +1,64 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "theme": "catppuccin-macchiato",
+    "agent": {
+        "api-designer": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/backend/api-designer.md}"
+        },
+        "backend-developer": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/backend/backend-developer.md}"
+        },
+        "csharp-developer": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/backend/net/csharp-developer.md}"
+        },
+        "dotnet-core-expert": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/backend/net/dotnet-core-expert.md}"
+        },
+        "dotnet-framework-4.8-expert": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/backend/net/dotnet-framework-4.8-expert.md}"
+        },
+        "vue-expert": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/frontend/vue-expert.md}"
+        },
+        "datadase-expert": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/db/database-administrator.md}"
+        },
+        "docker-expert": {
+            "mode": "subagent",
+            "prompt": "{file:./agents/ci/docker-expert.md}"
+        }
+    },
+    "mcp": {
+        "filesystem": {
+            "type": "local",
+            "command": [
+                "bunx",
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "/home/javi/projects"
+            ]
+        },
+        "postgres": {
+            "type": "local",
+            "command": [
+                "bunx",
+                "-y",
+                "@modelcontextprotocol/server-postgres",
+                "postgresql://{env:POSTGRES_USER}:{env:POSTGRES_PASSWORD}@localhost:5432/{env:POSTGRES_DB}"
+            ],
+            "enabled": true
+        },
+        "context7": {
+            "type": "remote",
+            "url": "https://mcp.context7.com/mcp",
+            "enabled": true
+        }
+    }
+}
