@@ -7,3 +7,7 @@ docker.io
 unzip
 bun
 dotnet-sdk-10.0
+gcc
+lazygit
+zsh
+lsd
