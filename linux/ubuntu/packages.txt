@@ -11,3 +11,4 @@ gcc
 lazygit
 zsh
 lsd
+pip install excalidraw-render
