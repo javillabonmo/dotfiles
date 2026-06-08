@@ -12,3 +12,4 @@ lazygit
 zsh
 lsd
 pip install excalidraw-render
+luarocks
