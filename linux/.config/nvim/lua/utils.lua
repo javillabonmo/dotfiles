@@ -8,7 +8,8 @@ local utils = {
 		"html",
 		"javascript",
 		"typescript",
-		"c_sharp"
+		"c_sharp",
+		"cshtml"
 	},
 	lsp_servers = {
 		"lua_ls",
