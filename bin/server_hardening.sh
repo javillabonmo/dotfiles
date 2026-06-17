@@ -8,13 +8,11 @@ HOST_NAME=""
 TIMEZONE=""
 PUBKEY_FILE=""
 SSH_PORT="2222"
-LOG_DISK=""          # Disco para partición de logs (ej. /dev/sdb)
-LOG_SIZE=""          # Tamaño (ej. 10G), si no se especifica se calcula automático
 
 # Función de ayuda
 usage() {
     cat <<EOF
-Uso: $0 --user USERNAME --hostname HOSTNAME --timezone TIMEZONE --pubkey PUBKEY_FILE [--ssh-port PORT] [--log-disk DISK] [--log-size SIZE]
+Uso: $0 --user USERNAME --hostname HOSTNAME --timezone TIMEZONE --pubkey PUBKEY_FILE [--ssh-port PORT]
 
 Opciones:
   --user USERNAME       Nombre del usuario a crear
@@ -22,11 +20,9 @@ Opciones:
   --timezone TIMEZONE   Zona horaria (ej: America/Bogota)
   --pubkey PUBKEY_FILE  Ruta a la llave pública SSH
   --ssh-port PORT       Puerto SSH (por defecto: 2222)
-  --log-disk DISK       Disco para crear partición adicional (ej. /dev/sdb)
-  --log-size SIZE       Tamaño de la partición (ej. 10G). Por defecto: 10% del espacio libre
 
 Ejemplo:
-  $0 --user javi --hostname web-prod-01 --timezone America/Bogota --pubkey ~/.ssh/id_ed25519.pub --ssh-port 2222 --log-disk /dev/sdb --log-size 20G
+  $0 --user javi --hostname web-prod-01 --timezone America/Bogota --pubkey ~/.ssh/id_ed25519.pub --ssh-port 2222
 
 Características:
   ✓ SSH solo con llave pública (PasswordAuthentication no)
@@ -36,7 +32,6 @@ Características:
   ✓ Firewall UFW activo
   ✓ Fail2Ban activo
   ✓ Swap configurado automáticamente
-  ✓ Partición adicional para logs (opcional, sin mover logs existentes)
 EOF
     exit 1
 }
@@ -62,14 +57,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --ssh-port)
             SSH_PORT="$2"
-            shift 2
-            ;;
-        --log-disk)
-            LOG_DISK="$2"
-            shift 2
-            ;;
-        --log-size)
-            LOG_SIZE="$2"
             shift 2
             ;;
         -h|--help)
@@ -114,12 +101,6 @@ echo "  Hostname: $HOST_NAME"
 echo "  Timezone: $TIMEZONE"
 echo "  Clave pública: $PUBKEY_FILE"
 echo "  Puerto SSH: $SSH_PORT"
-if [[ -n "$LOG_DISK" ]]; then
-    echo "  Disco para partición adicional: $LOG_DISK"
-    echo "  Tamaño: ${LOG_SIZE:-auto}"
-else
-    echo "  Partición adicional: No se creará"
-fi
 echo "========================================="
 echo "🔐 Modo: Opción 1"
 echo "  ✓ SSH: solo llave pública"
@@ -135,7 +116,7 @@ apt upgrade -y
 apt full-upgrade -y
 apt autoremove -y
 
-# [2/9] Instalar paquetes (incluido parted)
+# [2/9] Instalar paquetes
 echo "📦 [2/9] Instalando paquetes..."
 apt install -y \
     ufw \
@@ -149,87 +130,7 @@ apt install -y \
     vim \
     htop \
     python3 \
-    python3-pip \
-    parted
-
-# [2.5/9] Crear partición adicional en el disco especificado (sin tocar tabla)
-if [[ -n "$LOG_DISK" ]]; then
-    echo "💾 [2.5/9] Creando partición adicional en $LOG_DISK..."
-
-    # Verificar que el disco existe
-    if [[ ! -b "$LOG_DISK" ]]; then
-        echo "❌ El disco $LOG_DISK no existe o no es un bloque"
-        exit 1
-    fi
-
-    # Verificar que parted está instalado
-    if ! command -v parted &>/dev/null; then
-        echo "❌ parted no está instalado. Instálelo con: apt install parted"
-        exit 1
-    fi
-
-    # Obtener espacio libre en el disco (en GB)
-    FREE_SPACE=$(parted -s "$LOG_DISK" unit GB print free | grep 'Free Space' | awk '{print $3}' | sed 's/GB//' | head -1)
-    if [[ -z "$FREE_SPACE" || "$FREE_SPACE" -lt 5 ]]; then
-        echo "❌ No hay suficiente espacio libre en $LOG_DISK (mínimo 5GB). Espacio libre: ${FREE_SPACE:-0}GB"
-        exit 1
-    fi
-    echo "📊 Espacio libre disponible: ${FREE_SPACE}GB"
-
-    # Calcular tamaño si no se especificó
-    if [[ -z "$LOG_SIZE" ]]; then
-        # Usar 10% del espacio libre, mínimo 5GB, máximo 50GB
-        LOG_SIZE_GB=$((FREE_SPACE / 10))
-        [[ $LOG_SIZE_GB -lt 5 ]] && LOG_SIZE_GB=5
-        [[ $LOG_SIZE_GB -gt 50 ]] && LOG_SIZE_GB=50
-        LOG_SIZE="${LOG_SIZE_GB}G"
-        echo "📊 Tamaño auto-calculado: $LOG_SIZE"
-    else
-        # Verificar que el tamaño solicitado no exceda el espacio libre
-        REQ_SIZE_GB=$(echo "$LOG_SIZE" | sed 's/[^0-9]//g')
-        if [[ -n "$FREE_SPACE" && "$REQ_SIZE_GB" -gt "$FREE_SPACE" ]]; then
-            echo "❌ Tamaño solicitado ${LOG_SIZE} excede el espacio libre (${FREE_SPACE}GB)"
-            exit 1
-        fi
-    fi
-
-    # Obtener el inicio del primer espacio libre
-    START=$(parted -s "$LOG_DISK" unit GB print free | grep 'Free Space' | head -1 | awk '{print $1}' | sed 's/GB//')
-    if [[ -z "$START" ]]; then
-        echo "❌ No se encontró espacio libre en $LOG_DISK"
-        exit 1
-    fi
-    echo "📊 Inicio del espacio libre: ${START}GB"
-
-    # Crear partición en el espacio libre (sin modificar tabla existente)
-    echo "🔄 Creando partición de tamaño $LOG_SIZE a partir de ${START}GB..."
-    parted -s "$LOG_DISK" mkpart primary ext4 "${START}GB" "+${LOG_SIZE}"
-    partprobe "$LOG_DISK"
-    sleep 2
-
-    # Obtener el nombre de la nueva partición (la última creada)
-    NEW_PART=$(lsblk -lpo NAME,TYPE "$LOG_DISK" | grep part | tail -1 | awk '{print $1}')
-    if [[ -z "$NEW_PART" ]]; then
-        echo "❌ No se pudo detectar la nueva partición"
-        exit 1
-    fi
-    echo "📊 Nueva partición: $NEW_PART"
-
-    # Formatear como ext4
-    echo "🔄 Formateando $NEW_PART como ext4..."
-    mkfs.ext4 -L "LOG_PART" "$NEW_PART"
-
-    # Mostrar información (sin montar ni mover nada)
-    echo "✅ Partición creada y formateada: $NEW_PART ($LOG_SIZE)"
-    echo "ℹ️  No se ha montado ni se han movido logs."
-    echo "   Para usarla como /var/log, puede hacer:"
-    echo "   sudo systemctl stop rsyslog syslog"
-    echo "   sudo mount $NEW_PART /var/log"
-    echo "   sudo systemctl start rsyslog syslog"
-    echo "   (y agregar a /etc/fstab para persistencia)"
-else
-    echo "ℹ️ [2.5/9] Saltando creación de partición para logs (no se especificó --log-disk)"
-fi
+    python3-pip
 
 # [3/9] Crear usuario CON contraseña (Opción 1)
 echo "👤 [3/9] Creando usuario $USER_NAME..."
@@ -250,7 +151,6 @@ echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /home/$USER_NAME/.bashrc
 
 # Agregar a grupos
 usermod -aG sudo "$USER_NAME"
-# usermod -aG docker "$USER_NAME"  # Descomentar si se necesita docker
 
 # Generar contraseña temporal
 TEMP_PASS=$(openssl rand -base64 32)
@@ -424,10 +324,6 @@ echo "  - Timezone: $(timedatectl | grep 'Time zone')"
 echo "  - Usuario: $USER_NAME"
 echo "  - Puerto SSH: $SSH_PORT"
 echo "  - Swap: $(swapon -s | grep -q swapfile && echo 'Activo' || echo 'Inactivo')"
-if [[ -n "$LOG_DISK" && -n "$NEW_PART" ]]; then
-    echo "  - Partición adicional creada: $NEW_PART ($LOG_SIZE)"
-    echo "    (no montada, lista para usar)"
-fi
 echo
 echo "🔑 Credenciales:"
 echo "  Usuario: $USER_NAME"
@@ -448,21 +344,6 @@ echo "  ✓ Password SSH: DESHABILITADO"
 echo "  ✓ Firewall: ACTIVO"
 echo "  ✓ Fail2Ban: ACTIVO"
 echo "  ✓ Solo usuario $USER_NAME permitido en SSH"
-if [[ -n "$LOG_DISK" && -n "$NEW_PART" ]]; then
-    echo
-    echo "💾 Partición adicional para logs:"
-    echo "   Disco: $LOG_DISK"
-    echo "   Partición: $NEW_PART"
-    echo "   Tamaño: $LOG_SIZE"
-    echo "   Formato: ext4"
-    echo "   Para montarla en /data/logs:"
-    echo "     sudo mkdir -p /data/logs"
-    echo "     sudo mount $NEW_PART /data/logs"
-    echo "     (y agregar a /etc/fstab para persistencia)"
-    echo "     sudo blkid $NEW_PART  # para obtener UUID y usar en fstab"
-    echo "     sudo vim /etc/fstab  # agregar línea: UUID=xxxx-xxxx /data/logs ext4 defaults 0 2"
-    echo "     sudo mount -a  # para probar fstab"
-fi
 echo
 echo "⚠️  IMPORTANTE:"
 echo "  1. 🔑 Cambia la contraseña temporal: passwd"
