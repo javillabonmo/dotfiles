@@ -41,8 +41,9 @@
       "enabled": true
     },
     "playwright": {
-      "command": "bunx",
-      "args": ["@playwright/mcp@latest"]
+      "type": "local",
+      "command": ["bunx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
     }
   }
 }

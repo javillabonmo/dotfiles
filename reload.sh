@@ -3,3 +3,5 @@ rm -rf ~/.config/opencode
 
 cp -r linux/.config/nvim ~/.config/nvim
 cp -r linux/.config/opencode ~/.config/opencode
+
+export OBSIDIAN_VAULT="/home/javi/notes/js-ts/"
