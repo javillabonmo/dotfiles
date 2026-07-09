@@ -23,8 +23,7 @@ return {
             },
         })
 
-        vim.keymap.set('i', '<M-Space>', '<Cmd>Copilot suggestion<CR>',
-            { noremap = true, silent = true, desc = 'Copilot manual suggestion' })
+        
 
         require("copilot_cmp").setup({
             method = "getCompletionsCycling",
