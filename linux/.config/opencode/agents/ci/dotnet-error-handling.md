@@ -497,3 +497,157 @@ When modifying existing code:
 - Do not create catch blocks unless they have a clear responsibility.
 - Prefer enriching exceptions over logging them in lower layers.
 - Favor readability and consistency over clever implementations.
+
+# General Coding Conventions
+
+Unless explicitly requested otherwise, always follow these conventions when generating or modifying C# code.
+
+## Dependencies
+
+- Do not install NuGet packages.
+- Do not add new external dependencies.
+- Use only the .NET Base Class Library (BCL) unless the project already references the required package.
+- If an external dependency would improve the solution, mention it as an optional recommendation instead of introducing it into the code.
+
+---
+
+## Documentation
+
+Do not generate:
+
+- XML documentation comments (`///`)
+- `<summary>`
+- `<param>`
+- `<returns>`
+- Inline comments
+- Block comments
+
+Write code that is self-explanatory through clear naming and clean structure.
+
+---
+
+## nameof()
+
+Use `nameof()` whenever referring to compile-time symbols, including:
+
+- Classes
+- Interfaces
+- Enums
+- Properties
+- Fields
+- Methods
+- Parameters
+- Events
+
+Good:
+
+```csharp
+throw new ArgumentNullException(nameof(customerId));
+```
+
+Good:
+
+```csharp
+_logger.LogInformation(
+    "{Property}",
+    nameof(User.Name));
+```
+
+Avoid hardcoded member names whenever `nameof()` can be used.
+
+---
+
+## Current Method Name
+
+When the current executing method name must be captured dynamically for diagnostics or logging, use:
+
+```csharp
+MethodBase.GetCurrentMethod()?.Name
+```
+
+Example:
+
+```csharp
+_logger.LogDebug(
+    "Entering {Method}",
+    MethodBase.GetCurrentMethod()?.Name);
+```
+
+If the method name is known at compile time, prefer:
+
+```csharp
+nameof(GetForecastAsync)
+```
+
+Do not hardcode method names as string literals.
+
+---
+
+## Modern C# Style
+
+Prefer modern language features supported by the project's target framework.
+
+Examples include:
+
+- File-scoped namespaces
+- Global using directives (when already used by the project)
+- `var` when the type is obvious
+- Target-typed `new()`
+- Pattern matching
+- Switch expressions
+- Guard clauses
+- Collection expressions (when available)
+- Primary constructors (when supported)
+- Required members
+- Using declarations
+- Async/await
+
+---
+
+## Code Style
+
+Prefer:
+
+- Small methods
+- Single responsibility
+- Early returns
+- Guard clauses
+- Immutable objects where practical
+- Constructor injection
+- Clear and descriptive names
+- Consistent formatting
+
+Avoid:
+
+- Deep nesting
+- Magic strings
+- Magic numbers
+- `#region`
+- Premature optimization
+- Unnecessary abstraction
+- Unnecessary interfaces
+- Duplicate code
+- Placeholder implementations
+- TODO comments
+- Commented-out code
+
+---
+
+## Generated Code
+
+Generated code should:
+
+- Compile without modification.
+- Follow SOLID principles where appropriate.
+- Follow existing project conventions.
+- Preserve readability over cleverness.
+- Minimize allocations when practical without sacrificing clarity.
+- Not modify unrelated code.
+- Not introduce breaking changes unless explicitly requested.
+
+When refactoring existing code:
+
+- Make the smallest change necessary.
+- Preserve public APIs unless instructed otherwise.
+- Preserve existing behavior.
+- Prefer improving readability over rewriting entire files.
