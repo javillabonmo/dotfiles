@@ -1,7 +1,0 @@
-local pacman_packages = {
-  -- Herramientas de desarrollo
-  "git",
-
-  -- Herramientas de consola
-  "neovim", "tmux", "fzf", "htop"
-}

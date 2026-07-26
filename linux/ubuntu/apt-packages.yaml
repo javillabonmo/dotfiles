@@ -1,0 +1,28 @@
+development_environment:
+  version: "1.0"
+
+  essentials:
+    - git
+    - build-essential
+    - gcc
+
+  languages:
+    dotnet:
+      - dotnet-sdk-10.0
+
+    javascript:
+      - nodejs-24.26.0
+      - bun
+
+    python:
+      - python3
+      - python3-pip
+
+  containers:
+    - docker.io
+    
+  package_managers:
+    - pip
+
+  notes:
+    - "Node.js 24.26.0 requiere un repositorio compatible o un gestor de versiones como nvm o fnm."
