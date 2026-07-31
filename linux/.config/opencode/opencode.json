@@ -8,13 +8,19 @@
         "bunx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/home/{env:USER}"
+        "/home/{env:USER}/code"
       ]
     },
-    "git-local": {
+    "git-mcp-server": {
       "type": "local",
-      "command": ["bunx", "-y", "@modelcontextprotocol/server-git"],
-      "enabled": true
+      "enabled": false,
+      "command": [
+        "bunx",
+        "-y",
+        "@selfagency/git-mcp",
+        "--repo-path",
+        "/home/{env:USER}/code/{env:GIT_REPO_NAME}"
+      ]
     },
     "github": {
       "type": "remote",
@@ -73,6 +79,17 @@
       "type": "local",
       "command": ["bunx", "-y", "kubernetes-mcp-server@latest", "--readOnly"],
       "enabled": false
+    }
+  },
+  "permission": {
+    "git": "deny"
+  },
+
+  "agent": {
+    "git-workflow-manager": {
+      "permission": {
+        "git": "allow"
+      }
     }
   }
 }
