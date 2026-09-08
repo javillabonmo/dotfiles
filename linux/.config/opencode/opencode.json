@@ -79,6 +79,15 @@
       "type": "local",
       "command": ["bunx", "-y", "kubernetes-mcp-server@latest", "--readOnly"],
       "enabled": false
+    },
+
+    "excel": {
+      "type": "local",
+      "command": ["cmd", "/c", "npx", "--yes", "@negokaz/excel-mcp-server"],
+      "environment": {
+        "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
+      },
+      "enabled": false
     }
   },
   "permission": {
