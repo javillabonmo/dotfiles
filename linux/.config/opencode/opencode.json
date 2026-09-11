@@ -88,6 +88,11 @@
         "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
       },
       "enabled": false
+    },
+     "MCP_DOCKER": {
+      "type": "local",
+      "command": ["docker", "mcp", "gateway", "run"],
+      "enabled": true
     }
   },
   "permission": {
