@@ -78,20 +78,18 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-
-# opencode
-export PATH=/home/javi/.opencode/bin:$PATH
+# my config:3
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-export PATH=$PATH:/snap/bin
+
+#export PATH=$PATH:/snap/bin
 export PATH="$PATH:/home/javi/.dotnet/tools"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#export NVM_DIR="$HOME/.nvm"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -124,3 +122,25 @@ alias ls='lsd'
 alias ll='lsd -l'
 alias la='lsd -a'
 alias lla='lsd -la'
+
+# opencode
+export PATH=/home/tbrzc/.opencode/bin:$PATH
+export PATH="/opt/nvim-linux-x86_64/bin:$PATH"
+
+#https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
+
+#https://docs.docker.com/engine/cli/completion/#zsh
+#sudo apt install bash-completion
+#mkdir -p ~/.docker/completions
+#docker completion zsh > ~/.docker/completions/_docker
+
+#cat <<"EOT" >> ~/.zshrc
+#FPATH="$HOME/.docker/completions:$FPATH"
+#autoload -Uz compinit
+#compinit
+#EOT
+FPATH="$HOME/.docker/completions:$FPATH"
+autoload -Uz compinit
+compinit
